@@ -1,5 +1,4 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 import { logger } from "../utils/logger";
 
 let _client: SupabaseClient | null = null;
@@ -14,9 +13,11 @@ export function getSupabaseClient(): SupabaseClient {
     throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ws = require("ws");
   _client = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
-    realtime: { transport: ws },
+    realtime: { transport: ws as any },
   });
 
   logger.info("Supabase client initialized");
@@ -37,7 +38,6 @@ export interface HubSpotConnection {
   id: string;
   wix_instance_id: string;
   hubspot_portal_id: string;
-  // Tokens stored encrypted — never returned to browser
   access_token_enc: string;
   refresh_token_enc: string;
   token_expires_at: string;
